@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechHub | Tawfik Yakubu Portfolio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Orbitron', 'monospace'], // Robotic feel
+                    },
+                    colors: {
+                        cyber: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            900: '#0f172a', // Slate 900
+                            950: '#020617', // Slate 950
+                            accent: '#00f0ff', // Neon Cyan
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 8s linear infinite',
+                        'spin-reverse-slow': 'spin 12s linear infinite reverse',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'grid-flow': 'grid-flow 20s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 10px #00f0ff' },
+                            '50%': { opacity: .5, boxShadow: '0 0 20px #00f0ff' },
+                        },
+                        'grid-flow': {
+                            '0%': { backgroundPosition: '0 0' },
+                            '100%': { backgroundPosition: '40px 40px' }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14b8a6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Circuit Background Pattern - Animated */
+        .bg-grid-pattern {
+            background-image: linear-gradient(to right, rgba(20, 184, 166, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(20, 184, 166, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 1. Circuit Animation --- */
+        .circuit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+        }
+        .circuit-path {
+            fill: none;
+            stroke: #00f0ff;
+            stroke-width: 1.5;
+            stroke-dasharray: 100 1000;
+            stroke-dashoffset: 1000;
+            animation: circuitDash 8s linear infinite;
+        }
+        .circuit-path:nth-child(2) { animation-delay: 2s; }
+        .circuit-path:nth-child(3) { animation-delay: 4s; }
+        @keyframes circuitDash {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* --- 2. 3D AutoCAD Cube --- */
+        .cube-container {
+            perspective: 800px;
+            width: 120px;
+            height: 120px;
+        }
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateCube 15s infinite linear;
+        }
+        .face {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 1px solid rgba(0, 240, 255, 0.6);
+            background: rgba(0, 240, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-family: 'Orbitron', monospace;
+            color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            backface-visibility: visible;
+        }
+        /* Blueprint grid on faces */
+        .face::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.3) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .front  { transform: rotateY(0deg) translateZ(60px); }
+        .back   { transform: rotateY(180deg) translateZ(60px); }
+        .right  { transform: rotateY(90deg) translateZ(60px); }
+        .left   { transform: rotateY(-90deg) translateZ(60px); }
+        .top    { transform: rotateX(90deg) translateZ(60px); }
+        .bottom { transform: rotateX(-90deg) translateZ(60px); }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+
+        /* --- 3. Robotics Scanner Effect --- */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00f0ff;
+            box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+            opacity: 0;
+            z-index: 20;
+            pointer-events: none;
+        }
+        .group:hover .scanner-line {
+            animation: scan 2s ease-in-out infinite;
+            opacity: 0.8;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Gear Rotation */
+        .gear-spin { animation: spin 10s linear infinite; }
+        .gear-spin-rev { animation: spin 12s linear infinite reverse; }
+
+    </style>
+</head>
+<body class="bg-cyber-950 text-slate-300 font-sans antialiased overflow-x-hidden relative selection:bg-cyber-accent selection:text-cyber-950">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0 bg-grid-pattern animate-grid-flow pointer-events-none"></div>
+    
+    <!-- Animated Circuit Overlay (New) -->
+    <svg class="circuit-overlay" xmlns="http://www.w3.org/2000/svg">
+        <path class="circuit-path" d="M0,50 Q200,50 400,200 T800,200 T1200,50" />
+        <path class="circuit-path" d="M100,0 V300 H300 V600" />
+        <path class="circuit-path" d="M1200,800 Q1000,800 800,600 T400,600 T0,800" />
+    </svg>
+
+    <div class="fixed top-20 right-20 w-72 h-72 bg-cyber-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-pulse"></div>
+    <div class="fixed bottom-20 left-20 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-pulse delay-1000"></div>
+    
+    <!-- Floating particles/orbs -->
+    <div class="fixed top-1/4 left-1/4 w-2 h-2 bg-cyber-accent rounded-full animate-float opacity-50"></div>
+    <div class="fixed bottom-1/3 right-1/3 w-3 h-3 bg-blue-400 rounded-full animate-float-delayed opacity-50"></div>
+
+    <!-- Navigation (Top Left Focused) -->
+    <nav class="fixed top-0 left-0 w-full z-50 bg-cyber-950/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Left Side: Logo & Navigation Icons -->
+                <div class="flex items-center gap-6">
+                    <!-- Brand -->
+                    <a href="#" class="flex items-center gap-2 group">
+                        <div class="relative flex items-center justify-center w-10 h-10 bg-slate-800 rounded-lg border border-cyber-500/30 group-hover:border-cyber-accent transition-colors duration-300">
+                            <i data-lucide="cpu" class="w-6 h-6 text-cyber-accent"></i>
+                        </div>
+                        <span class="font-mono text-xl font-bold text-white tracking-widest group-hover:text-cyber-accent transition-colors">TECH<span class="text-cyber-500">HUB</span></span>
+                    </a>
+
+                    <!-- Desktop Nav (Icons + Tooltips) -->
+                    <div class="hidden md:flex items-center gap-1 ml-4 border-l border-white/10 pl-6">
+                        <a href="#home" class="p-2.5 rounded-md hover:bg-white/5 hover:text-cyber-accent transition-all group relative" aria-label="Home">
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-cyber-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-cyber-900 px-2 py-1 rounded border border-white/10">Home</span>
+                        </a>
+                        <a href="#about" class="p-2.5 rounded-md hover:bg-white/5 hover:text-cyber-accent transition-all group relative" aria-label="About">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-cyber-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-cyber-900 px-2 py-1 rounded border border-white/10">About</span>
+                        </a>
+                        <a href="#skills" class="p-2.5 rounded-md hover:bg-white/5 hover:text-cyber-accent transition-all group relative" aria-label="Skills">
+                            <i data-lucide="wrench" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-cyber-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-cyber-900 px-2 py-1 rounded border border-white/10">Skills</span>
+                        </a>
+                        <a href="#projects" class="p-2.5 rounded-md hover:bg-white/5 hover:text-cyber-accent transition-all group relative" aria-label="Projects">
+                            <i data-lucide="folder-code" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-cyber-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-cyber-900 px-2 py-1 rounded border border-white/10">Projects</span>
+                        </a>
+                        <a href="#contact" class="p-2.5 rounded-md hover:bg-white/5 hover:text-cyber-accent transition-all group relative" aria-label="Contact">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-cyber-accent opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-cyber-900 px-2 py-1 rounded border border-white/10">Contact</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="p-2 text-gray-400 hover:text-white">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-cyber-900 border-b border-white/10">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-cyber-accent hover:bg-white/5"><i data-lucide="home" class="inline w-4 h-4 mr-2"></i> Home</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-cyber-accent hover:bg-white/5"><i data-lucide="user" class="inline w-4 h-4 mr-2"></i> About</a>
+                <a href="#skills" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-cyber-accent hover:bg-white/5"><i data-lucide="wrench" class="inline w-4 h-4 mr-2"></i> Skills</a>
+                <a href="#projects" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-cyber-accent hover:bg-white/5"><i data-lucide="folder-code" class="inline w-4 h-4 mr-2"></i> Projects</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-cyber-accent hover:bg-white/5"><i data-lucide="mail" class="inline w-4 h-4 mr-2"></i> Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-20">
+
+        <!-- 1. HERO SECTION -->
+        <section id="home" class="min-h-[90vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <!-- Decorative circle -->
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 border border-cyber-500/20 rounded-full hidden lg:block animate-[spin_10s_linear_infinite]"></div>
+            <div class="absolute right-10 top-1/2 -translate-y-1/2 w-72 h-72 border border-cyber-500/10 rounded-full hidden lg:block animate-[spin_15s_linear_infinite_reverse]"></div>
+            
+            <!-- 3D AutoCAD Cube (New Animation) -->
+            <div class="absolute top-32 right-[15%] hidden lg:block animate-float">
+                <div class="cube-container">
+                    <div class="cube">
+                        <div class="face front">CAD</div>
+                        <div class="face back">DESIGN</div>
+                        <div class="face right">3D</div>
+                        <div class="face left">SIM</div>
+                        <div class="face top">TECH</div>
+                        <div class="face bottom">HUB</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Tech Elements -->
+            <div class="absolute left-10 top-20 text-cyber-500/20 animate-float hidden md:block"><i data-lucide="cpu" class="w-12 h-12"></i></div>
+            <div class="absolute right-20 bottom-20 text-blue-500/20 animate-float-delayed hidden md:block"><i data-lucide="wifi" class="w-12 h-12"></i></div>
+
+            <div class="max-w-4xl mx-auto text-center relative z-20">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-500/10 border border-cyber-500/20 text-cyber-400 text-sm font-mono mb-6 reveal">
+                    <span class="w-2 h-2 rounded-full bg-cyber-accent animate-pulse"></span>
+                    System Online
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl font-mono font-black text-white mb-6 tracking-tight reveal delay-100">
+                    TAWFIK <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-400 to-cyber-accent">YAKUBU</span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-slate-400 mb-4 font-light reveal delay-200">
+                    Aspiring Robotics Engineer & Innovator
+                </p>
+                
+                <p class="text-base md:text-lg text-slate-500 mb-10 max-w-2xl mx-auto reveal delay-300">
+                    Building practical engineering solutions through <span class="text-cyber-400">robotics</span>, <span class="text-cyber-400">electronics</span>, and <span class="text-cyber-400">mechanical design</span>.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 reveal delay-400">
+                    <a href="#projects" class="group relative px-8 py-3 bg-cyber-500 text-cyber-950 font-bold font-mono rounded-none skew-x-[-10deg] hover:bg-cyber-400 transition-colors">
+                        <span class="block skew-x-[10deg]">View My Projects</span>
+                        <div class="absolute inset-0 border border-white/20 -m-1 skew-x-[-10deg] hidden group-hover:block"></div>
+                    </a>
+                    <a href="#contact" class="px-8 py-3 border border-slate-700 text-slate-300 font-mono rounded-none skew-x-[-10deg] hover:border-cyber-accent hover:text-cyber-accent transition-colors">
+                        <span class="block skew-x-[10deg]">Contact Me</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT ME -->
+        <section id="about" class="py-20 bg-slate-900/50 border-y border-white/5">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 reveal">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="h-px bg-cyber-500/50 flex-1"></div>
+                    <h2 class="text-3xl font-mono font-bold text-white text-center">About Me</h2>
+                    <div class="h-px bg-cyber-500/50 flex-1"></div>
+                </div>
+                
+                <div class="bg-cyber-950 p-8 rounded-xl border border-white/5 shadow-2xl relative overflow-hidden group">
+                    <!-- Hover glow effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-cyber-500 to-blue-600 rounded-xl opacity-20 blur transition duration-500 group-hover:opacity-40"></div>
+                    
+                    <div class="relative flex flex-col md:flex-row gap-8 items-center">
+                        <div class="w-32 h-32 shrink-0 bg-slate-800 rounded-full flex items-center justify-center border-2 border-cyber-500/30 overflow-hidden relative">
+                            <!-- Rotating Robotics Ring around image -->
+                            <div class="absolute inset-0 border-2 border-dashed border-cyber-400 rounded-full animate-spin-slow opacity-50"></div>
+                            <i data-lucide="user" class="w-12 h-12 text-slate-600"></i>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <p class="text-lg text-slate-300 leading-relaxed">
+                                I am a self-driven robotics enthusiast with a strong interest in <strong class="text-cyber-400">automation</strong>, <strong class="text-cyber-400">electronics</strong>, and <strong class="text-cyber-400">mechanical systems</strong>. Coming from a challenging background, I taught myself engineering skills through hands-on projects. My goal is to design affordable and impactful robotic solutions that solve real-world problems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SKILLS -->
+        <section id="skills" class="py-24 relative">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <h2 class="text-3xl font-mono font-bold text-white mb-12 flex items-center gap-3 reveal">
+                    <i data-lucide="cpu" class="text-cyber-accent"></i> Technical Arsenal
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Card 1 -->
+                    <div class="bg-slate-900/80 p-6 rounded-lg border border-white/10 hover:border-cyber-500 transition-all hover:-translate-y-1 reveal delay-100 group overflow-hidden relative">
+                        <!-- Circuit BG inside card -->
+                        <div class="absolute top-0 right-0 p-2 opacity-10">
+                            <i data-lucide="zap" class="w-12 h-12"></i>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                            <i data-lucide="bot" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 font-mono">Robotics & Electronics</h3>
+                        <p class="text-sm text-slate-400">Arduino, ESP32, Sensors, Motors, Servo Control</p>
+                    </div>
+
+                    <!-- Card 2: Mechanical (With Gears) -->
+                    <div class="bg-slate-900/80 p-6 rounded-lg border border-white/10 hover:border-cyber-500 transition-all hover:-translate-y-1 reveal delay-200 group relative overflow-hidden">
+                        <!-- Animated Gears Background -->
+                        <div class="absolute -right-4 -top-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                             <i data-lucide="settings" class="w-16 h-16 gear-spin text-orange-400"></i>
+                        </div>
+                        <div class="absolute right-8 top-8 opacity-10 group-hover:opacity-30 transition-opacity">
+                             <i data-lucide="settings" class="w-10 h-10 gear-spin-rev text-orange-400"></i>
+                        </div>
+                        
+                        <div class="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-orange-500/20 transition-colors relative z-10">
+                            <i data-lucide="settings-2" class="w-6 h-6 text-orange-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 font-mono relative z-10">Mechanical Design</h3>
+                        <p class="text-sm text-slate-400 relative z-10">Prototyping, Mechanisms, Hydraulics, 3D Concepts</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-slate-900/80 p-6 rounded-lg border border-white/10 hover:border-cyber-500 transition-all hover:-translate-y-1 reveal delay-300 group">
+                        <div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition-colors">
+                            <i data-lucide="code-2" class="w-6 h-6 text-green-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 font-mono">Software</h3>
+                        <p class="text-sm text-slate-400">C/C++, Python, Embedded Systems Logic</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="bg-slate-900/80 p-6 rounded-lg border border-white/10 hover:border-cyber-500 transition-all hover:-translate-y-1 reveal delay-400 group">
+                        <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
+                            <i data-lucide="zap" class="w-6 h-6 text-purple-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3 font-mono">Tools</h3>
+                        <p class="text-sm text-slate-400">Linux, CAD, Soldering, Circuit Debugging</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. PROJECTS -->
+        <section id="projects" class="py-24 bg-slate-900/30 border-t border-white/5">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-3xl md:text-4xl font-mono font-bold text-white mb-4">Engineering Projects</h2>
+                    <p class="text-slate-400 max-w-xl mx-auto">Practical solutions built from scratch.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Project 1 -->
+                    <div class="bg-cyber-950 rounded-xl overflow-hidden border border-white/10 hover:border-cyber-accent/50 transition-all hover:shadow-[0_0_20px_rgba(45,212,191,0.1)] reveal group flex flex-col relative">
+                        <!-- Scanner Effect -->
+                        <div class="scanner-line"></div>
+                        
+                        <div class="h-48 bg-slate-800 relative overflow-hidden group-hover:bg-slate-700 transition-colors">
+                            <!-- Placeholder visual -->
+                            <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i data-lucide="armchair" class="w-16 h-16 text-white"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-cyber-900/80 backdrop-blur px-2 py-1 rounded text-xs font-mono text-cyber-400 border border-cyber-500/30">Robotics</div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-2 font-mono group-hover:text-cyber-400 transition-colors">Autonomous Robotic Arm</h3>
+                            <p class="text-slate-400 text-sm italic mb-4">Solves precise object handling in restricted spaces.</p>
+                            <p class="text-slate-300 text-sm mb-6 flex-grow">Designed and built a robotic arm capable of controlled movement using efficient motor drivers and kinematic logic.</p>
+                            
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">ESP32</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Servo Motors</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Embedded C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="bg-cyber-950 rounded-xl overflow-hidden border border-white/10 hover:border-cyber-accent/50 transition-all hover:shadow-[0_0_20px_rgba(45,212,191,0.1)] reveal delay-100 group flex flex-col relative">
+                         <!-- Scanner Effect -->
+                         <div class="scanner-line"></div>
+                        
+                         <div class="h-48 bg-slate-800 relative overflow-hidden group-hover:bg-slate-700 transition-colors">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i data-lucide="eye" class="w-16 h-16 text-white"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-cyber-900/80 backdrop-blur px-2 py-1 rounded text-xs font-mono text-cyber-400 border border-cyber-500/30">Automation</div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-2 font-mono group-hover:text-cyber-400 transition-colors">Smart Obstacle Avoidance Bot</h3>
+                            <p class="text-slate-400 text-sm italic mb-4">Navigates complex environments without collision.</p>
+                            <p class="text-slate-300 text-sm mb-6 flex-grow">A wheeled robot using ultrasonic sensors to detect and autonomously route around obstacles in real-time.</p>
+                            
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Arduino</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Ultrasonic</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">C++</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 -->
+                    <div class="bg-cyber-950 rounded-xl overflow-hidden border border-white/10 hover:border-cyber-accent/50 transition-all hover:shadow-[0_0_20px_rgba(45,212,191,0.1)] reveal delay-200 group flex flex-col relative">
+                         <!-- Scanner Effect -->
+                         <div class="scanner-line"></div>
+                        
+                         <div class="h-48 bg-slate-800 relative overflow-hidden group-hover:bg-slate-700 transition-colors">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <i data-lucide="home" class="w-16 h-16 text-white"></i>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-cyber-900/80 backdrop-blur px-2 py-1 rounded text-xs font-mono text-cyber-400 border border-cyber-500/30">IoT</div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-2 font-mono group-hover:text-cyber-400 transition-colors">Home Automation Prototype</h3>
+                            <p class="text-slate-400 text-sm italic mb-4">Remote control of electrical appliances.</p>
+                            <p class="text-slate-300 text-sm mb-6 flex-grow">Built a system to control lights and fans via a mobile interface using relay modules and WiFi connectivity.</p>
+                            
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">NodeMCU</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Relays</span>
+                                <span class="text-xs font-semibold px-2 py-1 bg-slate-800 text-slate-300 rounded border border-white/5">Blynk App</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. GOALS & VISION -->
+        <section class="py-20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-cyber-500/5 -skew-y-3 transform origin-left"></div>
+            <div class="max-w-4xl mx-auto px-6 relative z-10 text-center reveal">
+                <i data-lucide="target" class="w-12 h-12 text-cyber-accent mx-auto mb-6"></i>
+                <h2 class="text-3xl font-mono font-bold text-white mb-8">My Vision</h2>
+                <blockquote class="text-xl md:text-2xl font-light text-slate-300 leading-relaxed italic">
+                    "I aim to grow as a robotics engineer, gain mentorship, and contribute to projects that improve education, agriculture, and automation in developing communities."
+                </blockquote>
+            </div>
+        </section>
+
+        <!-- 6. CONTACT -->
+        <section id="contact" class="py-24 bg-slate-900 border-t border-white/5 relative overflow-hidden">
+             <!-- Background pulse for contact -->
+             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-cyber-500/5 blur-3xl animate-pulse pointer-events-none"></div>
+
+            <div class="max-w-4xl mx-auto px-4 text-center reveal">
+                <h2 class="text-3xl font-mono font-bold text-white mb-8">Connect With Me</h2>
+                <p class="text-slate-400 mb-10">Reach out for collaborations, robotics projects, or just to say hello.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <!-- Email -->
+                    <a href="mailto:tawfikyakubu0@gmail.com" class="flex items-center p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl hover:bg-slate-700/80 hover:scale-[1.02] transition-all group border border-white/5 hover:border-cyber-500/50 shadow-lg hover:shadow-cyber-500/10">
+                        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center group-hover:bg-cyber-500/20 transition-colors mr-4 shrink-0">
+                            <i data-lucide="mail" class="w-6 h-6 text-cyber-500 group-hover:text-cyber-accent"></i>
+                        </div>
+                        <div>
+                            <span class="block font-mono text-sm text-slate-400 mb-1">Email Me</span>
+                            <span class="block text-white font-medium break-all">tawfikyakubu0@gmail.com</span>
+                        </div>
+                    </a>
+
+                    <!-- Call -->
+                    <a href="tel:+233256301530" class="flex items-center p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl hover:bg-slate-700/80 hover:scale-[1.02] transition-all group border border-white/5 hover:border-cyber-500/50 shadow-lg hover:shadow-cyber-500/10">
+                        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center group-hover:bg-green-500/20 transition-colors mr-4 shrink-0">
+                            <i data-lucide="phone" class="w-6 h-6 text-green-500 group-hover:text-green-400"></i>
+                        </div>
+                        <div>
+                            <span class="block font-mono text-sm text-slate-400 mb-1">Call Contact</span>
+                            <span class="block text-white font-medium">+233 25 630 1530</span>
+                        </div>
+                    </a>
+                    
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/233538686156" target="_blank" class="flex items-center p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl hover:bg-slate-700/80 hover:scale-[1.02] transition-all group border border-white/5 hover:border-cyber-500/50 shadow-lg hover:shadow-cyber-500/10">
+                        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center group-hover:bg-green-500/20 transition-colors mr-4 shrink-0">
+                            <i data-lucide="message-circle" class="w-6 h-6 text-green-500 group-hover:text-green-400"></i>
+                        </div>
+                        <div>
+                            <span class="block font-mono text-sm text-slate-400 mb-1">WhatsApp</span>
+                            <span class="block text-white font-medium">+233 53 868 6156</span>
+                        </div>
+                    </a>
+
+                    <!-- LinkedIn -->
+                    <a href="https://linkedin.com/in/tawfik-yakubu-79b60330b" target="_blank" class="flex items-center p-6 bg-slate-800/50 backdrop-blur-sm rounded-xl hover:bg-slate-700/80 hover:scale-[1.02] transition-all group border border-white/5 hover:border-cyber-500/50 shadow-lg hover:shadow-cyber-500/10">
+                        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center group-hover:bg-blue-500/20 transition-colors mr-4 shrink-0">
+                            <i data-lucide="linkedin" class="w-6 h-6 text-blue-500 group-hover:text-blue-400"></i>
+                        </div>
+                        <div>
+                            <span class="block font-mono text-sm text-slate-400 mb-1">LinkedIn</span>
+                            <span class="block text-white font-medium">Connect Professionally</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="py-10 border-t border-white/5 bg-cyber-950 text-slate-400 text-sm relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                
+                <!-- Footer Brand -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center justify-center w-8 h-8 bg-slate-800 rounded border border-cyber-500/30">
+                        <i data-lucide="cpu" class="w-5 h-5 text-cyber-500"></i>
+                    </div>
+                    <span class="font-mono text-lg font-bold text-white tracking-widest">TECH<span class="text-cyber-500">HUB</span></span>
+                </div>
+
+                <!-- Copyright -->
+                <div class="text-center md:text-right">
+                    <p class="mb-2">&copy; 2024 TechHub. All Rights Reserved.</p>
+                    <div class="flex gap-4 justify-center md:justify-end text-xs text-slate-500">
+                        <a href="#" class="hover:text-cyber-accent transition-colors">Privacy Policy</a>
+                        <span class="text-slate-700">|</span>
+                        <a href="#" class="hover:text-cyber-accent transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Scroll Reveal Animation Logic
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
+    </script>
+</body>
+</html>
