@@ -1,0 +1,83 @@
+function doGet(e) {
+  var sheetId = '1WdwQ3QgxNO8NqH54gHI_xQh-UM3tmByusA71ScqJqiI';
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sheet = ss.getSheets()[0];
+  
+  // Get all data
+  var data = sheet.getDataRange().getValues();
+  
+  // If request is simple, return all data as JSON
+  // We assume the first row is headers
+  var headers = data[0];
+  var rows = data.slice(1);
+  
+  var result = rows.map(function(row, index) {
+    var obj = {
+      _row: index + 2 // Store 1-based row index (Header is 1, so first data is 2)
+    };
+    headers.forEach(function(header, i) {
+      obj[header] = row[i];
+    });
+    return obj;
+  });
+  
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var sheetId = '1WdwQ3QgxNO8NqH54gHI_xQh-UM3tmByusA71ScqJqiI';
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sheet = ss.getSheets()[0];
+
+  try {
+    var payload = JSON.parse(e.postData.contents);
+    var action = payload.action || 'create'; // create, update, delete
+    
+    if (action === 'create') {
+      // FIX: Swapped Description and Video Link order based on user feedback
+      // Assumed Sheet Order: Name, Type, Description, Video Link, Materials, Software, Code
+      var rowData = [
+        payload.Name,
+        payload.Type,
+        payload.Description,  // Moved to Column C
+        payload['Video Link'], // Moved to Column D
+        payload.Materials,
+        payload.Software,
+        payload.Code
+      ];
+      sheet.appendRow(rowData);
+      
+    } else if (action === 'update') {
+      var rowIndex = parseInt(payload._row);
+      if (rowIndex > 1) {
+        // Construct array for strict update
+        // Note: This overrides the whole row. Ensure all data is passed back!
+        var rowData = [
+           payload.Name,
+           payload.Type,
+           payload.Description,
+           payload['Video Link'],
+           payload.Materials,
+           payload.Software,
+           payload.Code
+        ];
+        // getRange(row, column, numRows, numColumns)
+        sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+      }
+      
+    } else if (action === 'delete') {
+      var rowIndex = parseInt(payload._row);
+      if (rowIndex > 1) {
+        sheet.deleteRow(rowIndex);
+      }
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ 'result': 'success' }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}

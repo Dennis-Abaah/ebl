@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Project Manager</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.jpeg" alt="EBL Logo" class="sidebar-logo">
+                <h2>EBL Admin</h2>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleSidebar()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="switchView('add', this)">
+                    <i data-lucide="plus-circle"></i>
+                    <span>Add Project</span>
+                </a>
+                <a href="#" class="nav-item" onclick="switchView('view', this)">
+                    <i data-lucide="list"></i>
+                    <span>View All</span>
+                </a>
+                <a href="#" class="nav-item" onclick="switchView('analytics', this)">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span>Analytics</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-item logout">
+                    <i data-lucide="log-out"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Overlay for mobile sidebar -->
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="header-left">
+                    <button class="menu-btn" onclick="toggleSidebar()">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <h1 id="pageTitle">New Project Entry</h1>
+                        <p id="pageDesc">Add a new project to your portfolio database.</p>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <span class="name">Admin User</span>
+                        <span class="role">Tawfik</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Views -->
+            <div class="content-wrapper">
+
+                <!-- VIEW 1: Add Project Form -->
+                <div id="view-add" class="dashboard-view">
+                    <form id="projectForm" class="project-form">
+                        <div class="form-grid">
+                            <!-- Project Basics -->
+                            <div class="form-section full-width">
+                                <h3><i data-lucide="file-text"></i> Basic Information</h3>
+                            </div>
+
+                            <div class="input-group full-width">
+                                <label for="pName">Project Name</label>
+                                <input type="text" id="pName" name="Name" placeholder="e.g. Autonomous Drone V2"
+                                    required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="pType">Project Type</label>
+                                <select id="pType" name="Type" required>
+                                    <option value="" disabled selected>Select Category</option>
+                                    <option value="Robotics">Robotics</option>
+                                    <option value="Automation">Automation</option>
+                                    <option value="3D Modeling">3D Modeling</option>
+                                </select>
+                            </div>
+
+                            <!-- Swapped Logic Order in Form as well to be safe, but labels are clear -->
+                            <div class="input-group">
+                                <label for="pVideo">Video/Image Link</label>
+                                <input type="url" id="pVideo" name="Video Link"
+                                    placeholder="https://youtube.com/watch?v=..." required>
+                            </div>
+
+                            <div class="input-group full-width">
+                                <label for="pDesc">Description</label>
+                                <textarea id="pDesc" name="Description" rows="4" placeholder="Brief overview..."
+                                    required></textarea>
+                            </div>
+
+                            <!-- Technical Details -->
+                            <div class="form-section full-width mt-4">
+                                <h3><i data-lucide="code-2"></i> Technical Stack</h3>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="pMaterials">Materials (Comma separated)</label>
+                                <input type="text" id="pMaterials" name="Materials" placeholder="ESP32, Servo...">
+                            </div>
+
+                            <div class="input-group">
+                                <label for="pSoftware">Software (Comma separated)</label>
+                                <input type="text" id="pSoftware" name="Software" placeholder="Fusion 360, Python...">
+                            </div>
+
+                            <div class="input-group full-width">
+                                <label for="pCode">Code</label>
+                                <input type="text" id="pCode" name="Code"
+                                    placeholder="e.g. Arduino Sketch, GitHub Repo...">
+                            </div>
+                        </div>
+
+                        <!-- Submission -->
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary"
+                                onclick="document.getElementById('projectForm').reset()">Clear Form</button>
+                            <button type="submit" class="btn-primary">
+                                <i data-lucide="upload-cloud"></i> Upload Project
+                            </button>
+                        </div>
+
+                        <div id="statusMessage" class="status-message hidden"></div>
+                    </form>
+                </div>
+
+                <!-- VIEW 2: View All Projects -->
+                <div id="view-view" class="dashboard-view hidden">
+                    <div class="card table-container">
+                        <div class="table-header-actions">
+                            <button class="btn-secondary" onclick="refreshData()">
+                                <i data-lucide="refresh-cw"></i> Refresh Data
+                            </button>
+                        </div>
+                        <div class="responsive-table">
+                            <table id="projectsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Description (Preview)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic Content -->
+                                    <tr>
+                                        <td colspan="4" class="text-center">Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: Analytics -->
+                <div id="view-analytics" class="dashboard-view hidden">
+                    <div class="analytics-grid">
+                        <div class="stat-card">
+                            <h3>Total Projects</h3>
+                            <p class="stat-number" id="totalProjects">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Top Category</h3>
+                            <p class="stat-number info" id="topCategory">-</p>
+                        </div>
+
+                        <div class="chart-card">
+                            <canvas id="typeChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <canvas id="softwareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Project</h2>
+                <button onclick="closeEditModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editRow" name="_row">
+                    <!-- Simplified Edit Fields (Mapped in JS) -->
+                    <div class="input-group">
+                        <label>Project Name</label>
+                        <input type="text" id="editName" name="Name" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Type</label>
+                        <select id="editType" name="Type" required>
+                            <option value="Robotics">Robotics</option>
+                            <option value="Automation">Automation</option>
+                            <option value="3D Modeling">3D Modeling</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Video Link</label>
+                        <input type="url" id="editVideo" name="Video Link">
+                    </div>
+                    <div class="input-group">
+                        <label>Description</label>
+                        <textarea id="editDesc" name="Description" rows="3"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Materials</label>
+                        <input type="text" id="editMaterials" name="Materials">
+                    </div>
+                    <div class="input-group">
+                        <label>Software</label>
+                        <input type="text" id="editSoftware" name="Software">
+                    </div>
+                    <div class="input-group">
+                        <label>Code</label>
+                        <input type="text" id="editCode" name="Code">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
